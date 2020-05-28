@@ -1,0 +1,521 @@
+<html lang="en">
+<head>
+	<meta charset="utf-8" />
+	<title>您的快递正在运输，，，</title>
+	<style type="text/css">
+		body, html{
+            width: 100%;
+            height: 100%;
+            margin:0;
+            font-family:"微软雅黑";
+            background-color: #f3f3f3 !important;
+            background: #f3f3f3;
+        }
+		#map_canvas{width:100%;height:6rem;}
+		#result {width:100%}
+        .warp{
+            width: 90%;
+            margin: 0.2rem auto;
+            /* padding: 0.4rem 0.4rem; */
+            box-sizing: border-box;
+            background: white;
+            box-shadow: white 0 2px;
+            border-radius: 0.2rem;
+            padding: 0.2rem;
+            box-sizing: border-box;
+        }
+        tbody {
+        display: table-row-group;
+        vertical-align: middle;
+        border-color: inherit;
+        table-layout: fixed;
+        }
+        table{
+            border-collapse: collapse;
+            /* border-collapse: separate;
+             border-spacing: 0.4rem;  */
+        }
+        tr{
+            display: table-row;
+            vertical-align: inherit;
+            border-color: inherit;
+        }
+        td{
+            padding: 0.2rem 0;
+        }
+       .last .row1{
+            width: 1rem;
+        }
+        .title{
+            display: block;
+            font-size: 0.4rem;
+        }
+        .massage{
+            display: block;
+            font-size: 0.3rem;
+            line-height: 0.5rem;
+        }
+        .status{
+            display: block;
+            width: 0.6rem;
+            height: 2rem;
+            /* background: url(../flies/images/d.png) no-repeat  100% ; */
+            background-size: 100%;
+            color: red;
+            position: relative;
+        }
+        .status img{
+            position: absolute;
+            background-size: 100%;
+            top: 50%;
+            left: -20%;
+            z-index: 1;
+            background-color: white;
+            width: 100%;
+            height: 25%;
+        }
+        .col2{
+            display: block;
+            width: 0.4rem;
+            height: 1.4rem;
+            background-size: 100%;
+            color: red;
+            position: relative;
+        }
+        .col2{
+            height: 96%;
+            position: absolute;
+            top: 1.4rem;
+            bottom: 0;
+            left: 20%;
+            right: 0;
+            width: 0;
+            border: 0.01rem #ccc solid;
+        }
+        .last:last-child .col2{
+            top: -0.5rem;
+        }
+        .line1{
+            height: 1rem;
+            width: 0.1rem;
+            border: 1px #ccc solid;
+            top: 0;
+            bottom: 0;
+            left: 0;
+            right: 0;
+        }
+        .step{
+            height: 100%;
+        }
+        
+        /* 物流信息 */
+        .log{
+            border-radius: 0.2rem;
+        }
+        .last{
+            color: rgb(173, 173, 169);
+        }
+        .last .row1 {
+        width: 1rem;
+        font-size: 0.3rem;
+        }
+        .last:first-child{
+            color: black;
+        }
+
+        .public_title{
+            width: 6rem;
+            padding: 0.625rem 2rem;
+            margin: 0 auto;
+            color: red;
+            font-size: 0.5rem;
+            text-align: center;
+            background-color: #f3f3f3;
+            box-sizing: border-box;
+            width: 100%;
+            overflow: hidden;
+            /* background: url(https://sms-shop.oss-cn-beijing.aliyuncs.com/shopPicture/index_09.jpg) repeat-x center center; */
+        }
+        .public_title span{
+            /* background: #f9f5f5; */
+            display: block;
+            position: relative;
+        }
+        .public_title span::before{
+            content: "-----";
+            display: block;
+            color: #231a1a;
+            position: absolute;
+        }
+        .public_title span::after{
+            content: "-----";
+            display: block;
+            color: #231a1a;
+            position: absolute;
+            right: 0;
+            top: 0;
+        }
+        .moreproduct{
+            width: 100%;
+            overflow: hidden;
+            padding: 0.2rem;
+            box-sizing: border-box;
+            background-color: #f3f3f3;
+        }
+       .productlist{
+            width: 49%;
+            overflow: hidden;
+            background: white;
+            float: left;
+            margin-bottom: 0.2rem;
+            border-radius: 0.2rem;
+            box-shadow: #ccc 0.04rem 0.04rem;
+        }
+       .productlist:nth-of-type(2n-1){
+            margin-right: 2%;
+        }
+       .productlist .proimg{
+            width: 100%;
+            position: relative;
+            padding-top: 100%;
+        }
+        .productlist .proimg img{
+            background-size: 90%;
+            width: 100%;
+            position: absolute;
+            top: 0;
+            height: 100%;
+        }
+        .productlist span{
+            font-size: 0.4rem;
+            text-align: left;
+            display: block;
+            padding: 0.2rem 0 0 0; 
+            float: left;
+        }
+        .productlist span:first-child{
+            width: 100%;
+        }
+        .productlist .proimg span{
+            float: left;
+        }
+        .promsg span:nth-child(2){
+            float: left;
+            color: red;
+            font-size: 0.4rem;
+        }
+        .productlist .promsg span:nth-child(3){
+            color: rgba(170, 170, 170,1);
+            text-decoration: line-through;
+            /* padding: 0.2rem 0 0 0; */
+
+        }
+        .promsg span:last-child{
+            float: right;
+            text-align: center;
+            color: rgba(170, 170, 170,1);
+        }
+        /* 物流折叠 */
+        /* .result-info tbody tr:not(.first):not(.second){
+            display: none;
+        } */
+        
+	</style>
+    <script type="text/javascript" src="http://api.map.baidu.com/api?v=3.0&ak=h3quqxGmUyGTPXAd8dj8mfkLNAaqfWpR"></script>
+    <script type="text/javascript" src="http://api.map.baidu.com/library/LuShu/1.2/src/LuShu_min.js"></script>
+    <script src="../flies/js/flexible.js"></script>
+</head>
+<body>
+	<div id="map_canvas"></div>
+    <div id="result"></div>
+    <div class="warp">
+    <div class="log">
+                <table class="result-info" cellspacing="0">
+                    <tbody>
+                        <tr class="last first">
+                            <td class="row1">
+                                <span class="day"></span>
+                                <span class="time"></span>
+                            </td>
+                            <td class="status status-check">&nbsp;
+                                <img src="../flies/images/shou.png" alt="" srcset="">
+                                <div class="col2">
+                                </div>
+                                
+                            </td>
+                            <td>
+                                <span class="title">已经签收</span>
+                                <span class="massage">[你的快递]已经到达了基督教阿克苏积分接口就看见卡即将经会计师的考虑</span>
+                            </td>
+                        </tr>
+                        <tr class="last second">
+                            <td class="row1">
+                                <span class="day">08.18</span>
+                                <span class="time">17:43</span>
+                            </td>
+                            <td class="status status-check">&nbsp;
+                                <img src="../flies/images/yes.png" alt="" srcset="">
+                                <div class="col2">
+                                </div>
+                            
+                            </td>
+                        <td>
+                            <span class="title">已经签收</span>
+                            <span class="massage">[你的快递]已经到达了基督教阿克苏积分接口就看见卡即将经会计师的考虑</span>
+                        </td>
+                        </tr>
+                        <tr class="last">
+                            <td class="row1">
+                                <span class="day">08.18</span>
+                                <span class="time">17:43</span>
+                            </td>
+                            <td class="status status-check">&nbsp;
+                                <img src="../flies/images/dian.png" alt="" srcset="">
+                                <div class="col2">
+                                </div>
+                                
+                            </td>
+                            <td>
+                                <span class="title">已经签收</span>
+                                <span class="massage">[你的快递]已经到达了基督教阿克苏积分接口就看见卡即将经会计师的考虑</span>
+                            </td>
+                        </tr>
+                        <tr class="last">
+                            <td class="row1">
+                                <span class="day">08.18</span>
+                                <span class="time">17:43</span>
+                            </td>
+                            <td class="status status-check">&nbsp;
+                                <img src="../flies/images/dian.png" alt="" srcset="">
+                                <div class="col2">
+                                </div>
+                                
+                            </td>
+                            <td>
+                                <span class="title">已经签收</span>
+                                <span class="massage">[你的快递]已经到达了基督教阿克苏积分接口就看见卡即将经会计师的考虑</span>
+                            </td>
+                        </tr>
+                        <tr class="last">
+                            <td class="row1">
+                                <span class="day">08.18</span>
+                                <span class="time">17:43</span>
+                            </td>
+                            <td class="status status-check">&nbsp;
+                                <img src="../flies/images/dian.png" alt="" srcset="">
+                                <div class="col2">
+                                </div>
+                                
+                            </td>
+                            <td>
+                                <span class="title">已经签收</span>
+                                <span class="massage">[你的快递]已经到达了基督教阿克苏积分接口就看见卡即将经会计师的考虑</span>
+                            </td>
+                        </tr>
+                        <tr class="last">
+                            <td class="row1">
+                                <span class="day">08.18</span>
+                                <span class="time">17:43</span>
+                            </td>
+                            <td class="status status-check">&nbsp;
+                                <img src="../flies/images/new.png" alt="" srcset="">
+                                <div class="col2">
+                                </div>
+                                
+                            </td>
+                            <td>
+                                <span class="title">已发货</span>
+                                <span class="massage">商品正在等待揽收</span>
+                            </td>
+                        </tr>
+                        <tr class="last">
+                            <td class="row1">
+                                <span class="day">08.18</span>
+                                <span class="time">17:43</span>
+                            </td>
+                            <td class="status status-check">&nbsp;
+                                <img src="../flies/images/xiadanz.png" alt="" srcset="">
+                                <div class="col2">
+                                </div>
+                                
+                            </td>
+                            <td>
+                                <span class="title">已下单</span>
+                                <span class="massage">商品已经下单</span>
+                            </td>
+                        </tr>
+                    </tbody>
+                </table>    
+            </div>
+        </div>
+        <div class="public_title"><span>你可能还喜欢</span></div>
+        <div class="moreproduct">
+            <div class="productlist cleaner">
+                <div class="proimg">
+                    <img src="https://sms-shop.oss-cn-beijing.aliyuncs.com/ncheaner/banner.jpg" alt="">
+                </div>
+                <div class="promsg">
+                    <span>解放双手，扫地神器，从此解放双手</span>
+                    <span>￥199</span>
+                    <span>￥288</span>
+                    <span>4541人购买</span>
+                </div>
+            </div>
+            <div class="productlist bookse">
+                <div class="proimg">
+                    <img src="https://sms-shop.oss-cn-beijing.aliyuncs.com/worldfamousP/banner.jpg" alt="">
+                </div>
+                <div class="promsg">
+                    <span>爱收藏,爱思考,论语孟子庄子等国学书籍冰价来袭</span>
+                    <span>￥99</span>
+                    <span>￥288</span>
+                    <span>4541人购买</span>
+                </div>
+            </div>
+            <div class="productlist booknf">
+                <div class="proimg">
+                    <img src="https://sms-shop.oss-cn-beijing.aliyuncs.com/sounds/banner.jpg" alt="">
+                </div>
+                <div class="promsg">
+                    <span>惊喜！惊喜！54册只需268元</span>
+                    <span>￥268</span>
+                    <span>￥288</span>
+                    <span>4541人购买</span>
+                </div>
+            </div>
+            <div class="productlist massage">
+                <div class="proimg">
+                    <img src="https://sms-shop.oss-cn-beijing.aliyuncs.com/massage/banner.gif" alt="">
+                </div>
+                <div class="promsg">
+                    <span>多功能颈部按摩仪，颈椎健康的福音!</span>
+                    <span>￥199</span>
+                    <span>￥299</span>
+                    <span>4541人购买</span>
+                </div>
+            </div>
+        </div>
+</div>
+	<script>
+	var map = new BMap.Map('map_canvas');
+	map.enableScrollWheelZoom();
+	map.centerAndZoom(new BMap.Point(116.404, 39.915), 13);
+	var lushu;
+	// 实例化一个用来生成路线
+    var drv = new BMap.DrivingRoute('苏州', {
+        onSearchComplete: function(res) {
+            if (drv.getStatus() == BMAP_STATUS_SUCCESS) {
+                var plan = res.getPlan(0);
+                var arrPois =[];
+                for(var j=0;j<plan.getNumRoutes();j++){
+                    var route = plan.getRoute(j);
+                    arrPois= arrPois.concat(route.getPath());
+                }
+                map.addOverlay(new BMap.Polyline(arrPois, {strokeColor: '#ff9800'}));
+                map.setViewport(arrPois);
+                lushu = new BMapLib.LuShu(map,arrPois,{
+                defaultContent:"天安门到百度大厦",//"从天安门到百度大厦"
+                autoView:true,//是否开启自动视野调整，如果开启那么路书在运动过程中会根据视野自动调整
+                icon  : new BMap.Icon('../flies/images/kuaidiyunshu.png', new BMap.Size(52,26),{anchor : new BMap.Size(27, 13)}),
+                speed: 4500,
+                enableRotation:true,//是否设置marker随着道路的走向进行旋转
+                landmarkPois: [
+                   {lng:116.314782,lat:39.913508,html:'加油站',pauseTime:2},
+                   {lng:116.315391,lat:39.964429,html:'高速公路收费<div><img src="//map.baidu.com/img/logo-map.gif"/></div>',pauseTime:3},
+                   {lng:116.381476,lat:39.974073,html:'肯德基早餐',pauseTime:2}
+                ]});
+            }
+        }
+    });
+    
+    var map = new BMap.Map("map_canvas");
+	var point = new BMap.Point(116.404, 39.915,120.417, 200.909);
+	map.centerAndZoom(point, 15);
+	//创建car
+	var pt = new BMap.Point(117.717, 36.909);
+	var myIcon = new BMap.Icon("../flies/images/new.png", new BMap.Size(16,16));
+	var marker2 = new BMap.Marker(pt,{icon:myIcon});  // 创建标注
+    map.addOverlay(marker2);
+      
+
+    var start=new BMap.Point(120.57847178570609,31.301932876554099);
+    var end=new BMap.Point(116.308102,40.056057);
+    drv.search(start, end);
+    
+
+    var vectorMarker = new BMap.Marker(new BMap.Point(120.57847178570609,31.301932876554099), {
+      // 指定Marker的icon属性为Symbol
+      icon: new BMap.Symbol(BMap_Symbol_SHAPE_POINT, {
+        scale: 0.5,//图标缩放大小
+        fillColor: "orange",//填充颜色
+        fillOpacity: 0.8//填充透明度
+      })
+    });
+    map.addOverlay(vectorMarker);
+    //设置指定的颜色
+    var label = new BMap.Label("收：苏州市",{offset:new BMap.Size(-20,-20)});
+    label.setStyle({
+        　  color : "white", //字体颜色
+　　        fontSize : "12px",//字体大小 　　
+　　        backgroundColor :"red", //文本标注背景颜色　
+        　　border :"1px red solid", 　　
+        　　fontWeight :"bold", //字体加粗
+            borderRaduis:"20%",
+            width:"60px"
+            
+    })
+    vectorMarker.setLabel(label);
+    var vectorMarker1 = new BMap.Marker(new BMap.Point(116.308102,40.056057), {
+      // 指定Marker的icon属性为Symbol
+      icon: new BMap.Symbol(BMap_Symbol_SHAPE_POINT, {
+        scale: 0.5,//图标缩放大小
+        fillColor: "orange",//填充颜色
+        fillOpacity: 0.8//填充透明度
+      })
+    });
+    map.addOverlay(vectorMarker1);
+    //设置指定的颜色
+    var label1 = new BMap.Label("发：北京市",{offset:new BMap.Size(-20,-20)});
+    label1.setStyle({
+        　  color : "white", //字体颜色
+　　        fontSize : "12px",//字体大小 　　
+　　        backgroundColor :"red", //文本标注背景颜色　
+        　　border :"1px red solid", 　　
+        　　fontWeight :"bold", //字体加粗
+            borderRaduis:"20%",
+            width:"60px"
+            
+    })
+    vectorMarker1.setLabel(label1);
+	function $(element){
+		return document.getElementById(element);
+	};
+
+</script>
+
+<script src="../flies/js/jquery.min.js"></script>
+    <script>
+    var baseUrl = "http://sms-yx-api-http.hanlonglyt.com/labelson/click.do"+`?cid=4545454&mobile=13111182711&url=`+"http://shop.hanlonglyt.com";
+		$(".cleaner").click(function() {
+            window.location.href = baseUrl+`/h5tpl/cleaneractiveo&des=智能扫地机器人`,
+            defOnClick("智能扫地机器人-点击");
+        });
+
+        $(".bookse").click(function(){
+            window.location.href = baseUrl+`/h5tpl/worldfamouso&des=国学经典7`,
+            defOnClick("国学经典7-点击");
+        });
+
+        $(".booknf").click(function(){
+            window.location.href = baseUrl+`/h5tpl/sounds&des=国学经典54`,
+            defOnClick("国学经典54-点击");
+        });
+
+        $(".nassage").click(function(){
+            window.location.href = baseUrl+`/h5tpl/massageactiveo&des=按摩仪`,
+            defOnClick("按摩仪-点击");
+        });
+        
+    </script>
+</body>
+</html>
